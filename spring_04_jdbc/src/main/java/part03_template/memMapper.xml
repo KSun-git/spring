@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+ <mapper namespace="mem">
+     <select id="all" resultType="part03_template.MemDTO">
+         select * from mem order by num
+     </select>
+     
+     <insert id="ins" parameterType="part03_template.MemDTO">
+         insert into mem
+         values(mem_num_seq.nextval, #{name}, #{age}, #{loc})
+     </insert>
+     
+     <update id="upt" parameterType="part03_template.MemDTO">
+         update mem set name=#{name} where num=#{num}
+     </update>
+     
+     <update id="del" parameterType="int">
+         delete from mem where num=#{num}
+     </update>
+     
+     <select id="one" parameterType="int" resultType="part03_template.MemDTO">
+         select * from mem where num=#{num}
+     </select>
+     
+     <select id="cnt" resultType="int">
+         select count(*) from mem
+     </select>
+     
+     <select id="search" parameterType="int" resultType="part03_template.MemDTO">
+         <![CDATA[ select * from mem where num < #{num} ]]>
+     </select> 
+     
+     <select id="range" parameterType="java.util.HashMap" resultType="part03_template.MemDTO">
+         <![CDATA[ select * from mem where num >= #{start} and num <=#{end}]]>
+                                            <!-- {}안의 이름은 HashMap에 담을때 key의 이름과 동일해야함!!! -->
+     </select>
+     
+ </mapper>

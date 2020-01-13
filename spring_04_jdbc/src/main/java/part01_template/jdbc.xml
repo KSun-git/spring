@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	                              http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+<!-- [1] DataSource 빈 선언 -->
+    <bean id="dataSource_bean" class="org.springframework.jdbc.datasource.DriverManagerDataSource" >
+        <property name="driverClassName" value="oracle.jdbc.OracleDriver" />
+        <property name="url" value="jdbc:oracle:thin://@192.168.106.1:2000:orcl" />
+        <property name="username" value="hr" />
+        <property name="password" value="oracle4U" />
+    </bean>
+    
+<!-- [2] JdbcTemplate 빈 선언 -->
+    <bean id="jdbcTemplate_bean" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource_bean"></property>
+    </bean>
+    
+<!-- [3] MemDaoImp 빈 선언 -->
+    <bean id="dao" class="part01_template.MemDaoImp">
+        <property name="jdbcTemplate" ref="jdbcTemplate_bean" />
+    </bean>
+    
+    
+</beans>

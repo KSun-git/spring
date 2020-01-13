@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="emp">
+	<select id="search" parameterType="java.util.HashMap" resultType="part05_emp.EmpDTO" >
+	    <!-- rownum 이용해서 검색 --> 
+	    <![CDATA[
+	        select employee_id, first_name, salary, hire_date 
+	        from ( select A.*, rownum as rnum 
+	         from ( select employee_id, first_name, salary, hire_date 
+	          from employees order by salary desc) A
+	          where rownum <=#{end}) 
+	          where rnum >= #{start}
+	    ]]>
+	    
+	    <!-- rank함수 이용해서 검색 -->
+	    <!-- 
+	    <![CDATA[
+	        SELECT employee_id, first_name, salary, hire_date 
+	        from (SELECT RANK()OVER (ORDER BY salary DESC)as RANK, employee_id, first_name, salary, hire_date 
+	        FROM EMPLOYEES) A 
+	        where RANK >= #{start} and RANK <= #{end}	                  
+	    ]]>
+	     -->
+	</select>
+	
+</mapper>
+ 
+ 
+ 
+ 
+ 
+ 
