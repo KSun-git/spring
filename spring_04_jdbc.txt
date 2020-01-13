@@ -1,0 +1,72 @@
+=================┌[spring_04_jdbc]┐=================
+1>Spring에서는 자체 jdbc를 제공하긴합니다. 그러나, 이는 거의 사용되지않는다. 
+        대부분의 경우 Mabatis를 이용하여 DB를 주고받습니다.
+                           └>(part3부터 확실히 알아두세요!)
+
+1-2>JdbcTemplate이용
+        -------------------------┌{part01_template}┐-------------------------
+        <<pom.xml>>
+          |[*] aspectj 등록
+
+        <<설정파일>>
+          |[1] DataSource 빈 선언 : db연결정보 담겨있음
+          |[2] JdbcTemplate 빈 선언 : 쿼리문실행메소드들 담겨있음
+          |[3] DaoImp 선언
+
+1-3>DaoSupport이용(JdbcTemplate상속받은객체임)
+        ------------------------┌{part02_daoSupport}┐------------------------
+        <<설정파일>>
+          |[1] DataSource 빈 선언
+          |[2] DaoImp 선언
+
+        <<DaoImp.java>>
+          |[*] JdbcDaoSupport 추가 상속받아 사용
+
+
+
+★★★2>Mybatis
+    ※[DAO]↔[Mybatis]↔[DataBase]
+       Dao와 DataBase 사이에서 Mybatis를 이용하여 db정보를 주고받습니다.
+    ※(Database Table의 컬럼명)-(DTO의 변수명)-(Form태그의 name속성값)을 
+       일치시켜주면 Spring이 자동적으로 세팅해줍니다.
+    ※MyBatis에서는 파라미터타입으로 하나의 인자값만 설정가능합니다.
+       복수개의 인자값 요구되는경우는 HashMap으로 넘겨줘야합니다.
+
+2-1>JdbcTemplate이용 : 권장
+        -------------------------┌{part03_template}┐-------------------------
+        <<pom.xml>>
+          |[*] MyBatis 등록
+          |[*] MyBatis-Spring등록
+
+        <<설정파일>>
+          |[1] DataSource 빈 선언 : db연결정보 담겨있음
+          |[2] SqlSessionFactoryBean 빈 선언 : Mabatis객체들을 관리하는 빈
+          |       └>property : dataSource,
+          |                           mapperLocations | configLocation 중 택1
+          |[3] SqlSessionTemplate 빈 선언 : 쿼리문 동작하기위한 메소드제공
+          |       └>sqlSessionFactory참조
+          |[4] DaoImp 빈 선언
+          |       └>property : sqlSessionTemplate
+
+┌─  <<Mapper.xml>>
+│      |쿼리문작성
+│
+└>  <<config/configuration.xml>>
+        |typeAliases 사용할때 사용(권장하지않음)
+        |cf)여러 Mapper.xml등록하여 통합관리가능
+
+
+2-2>daoSupport이용
+        ------------------------┌{part04_daoSupport}┐------------------------
+        <<설정파일>>
+          |[1] DataSource 빈 선언
+          |[2] SqlSessionFactoryBean 빈 선언 : Mabatis객체들을 관리하는 빈
+          |[3] DaoImp 빈 선언
+
+        <<DaoImp.java>>
+          |[*] SqlSessionDaoSupport 추가 상속받아 사용
+
+2-3>과제
+        ---------------------------┌{part05_emp}┐----------------------------
+        Employees테이블에서 salary이  높은 5-10랭크에 해당하는
+        employee_id, first_name, salary, hire_date 를 출력하시오.
