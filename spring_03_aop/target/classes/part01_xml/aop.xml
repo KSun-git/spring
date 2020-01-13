@@ -24,7 +24,9 @@
             <aop:before method="comm1" pointcut="execution(* part01_xml.ServiceImp.prn1(*))"/>
             <aop:before method="comm1" pointcut="execution(* part01_xml.ServiceImp.prn1(*,*))"/>
                공통작업이면 아래처럼 통합가능합니다.-->
+            <!--                                  ┌포인트컷 지정자              ┌타겟이 되는 메소드                            -->
             <aop:before method="comm1" pointcut="execution(* part01_xml.ServiceImp.prn1(..))"/>
+            <!--   └어드바이스                                                                         └리턴타입                                        인자타입┘  -->
         <!--
             pointcut이 복잡한경우 이처럼 분리하여 사용 가능합니다. 
             <aop:pointcut expression="execution(* part01_xml.ServiceImp.prn1(..))" id="aa" />
