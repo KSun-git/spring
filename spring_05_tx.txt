@@ -1,0 +1,65 @@
+=================┌[spring_05_tx]┐=================
+1>트랜잭션([Service]↔[TransactionManager]↔[DAO])
+    두 개 이상의 쿼리를 한 작업으로 실행해야 할 때 사용되어, 여러 쿼리를 논리적으로 하나의 
+    작업단위로 묶어준다.
+    ※단위 내에서 오류(Exception)가 발생할 경우, 롤백처리를 해줘야 합니다!
+
+2>트랜잭션처리
+    방법1.TransactionTemplate이용
+        -----------------------------┌{part01}┐-----------------------------
+        <<설정파일>>
+          |[1] DataSource 빈 선언
+          |[2] SqlSessionFactoryBean 빈 선언
+          |[3] SqlSessionTemplate 빈 선언
+          |[4] TransactionManager 빈 선언 : 트랜잭션 객체 관리
+          |       └>property : dataSource
+          |[5] TransactionTemplate 빈 선언 : 트랜잭션 처리
+          |       └>property : transationManager
+          |[6] Dao 빈 선언
+          |       └>property : sqlSession
+          |[7] Service 빈 선언
+          |       └>property : dao, transactionTemplate
+
+        <<ServiceImp.java>>
+          |[*] 묶어줄 dao메소드호출 부분에서 직접 TransactionTemplate 적용.
+
+    방법2.선언적 트랜잭션(<tx:advice>)이용
+        -----------------------------┌{part02}┐-----------------------------
+        <<설정파일>>
+          |[*]Namespances : aop , tx 등록
+          |[1] DataSource 빈 선언
+          |[2] SqlSessionFactoryBean 빈 선언
+          |[3] SqlSessionTemplate 빈 선언
+          |[4] TransactionManager 빈 선언
+          |[5] 선언적 트랜잭션:<tx:advice> 처리
+          |       └><tx:attributes> : 롤백 진행 method등록
+          |[6] AOP로 트랜잭션 처리할 메소드에 transactionManager등록
+          |       └><aop:pointsut>, <aop:advisor>등록
+          |[7] Dao 빈 선언
+          |[8] Service 빈 선언
+
+        <<Spring.java>>
+          |[*] 트랜잭션처리는 설정파일의 5,6번 설정으로 이미 처리되었으므로, 이 메인메소드
+          |      에서 서비스 호출 시의 예외처리만 적절하게 해주면 된다.
+
+    방법3.어노테이션(@Transactional)이용
+        -----------------------------┌{part03}┐-----------------------------
+        <<설정파일>>
+          |[*]Namespances : tx 등록
+          |[*]<tx:annotation-driven/>선언
+          |[1] DataSource 빈 선언
+          |[2] SqlSessionFactoryBean 빈 선언
+          |[3] SqlSessionTemplate 빈 선언
+          |[4] TransactionManager 빈 선언
+          |[5] 선언적 트랜잭션:<tx:advice> 등록
+          |       └>※롤백 진행 method는 어노테이션으로 처리할것임!
+          |[6] Dao 빈 선언
+          |[7] Service 빈 선언
+
+        <<ServiceImp.java>>
+          |[*] @Transactional(rollbackFor=java.lang.Exception.class)
+          |       작업단위 메소드에서 위 어노테이션 적용.
+
+        <<Spring.java>>
+          |[*] 트랜잭션처리는 service메소드에서 어노테이션으로 이미처리함. 이메인메소드
+          |      에서 서비스 호출 시의 예외처리만 적절하게 해주면 된다.
