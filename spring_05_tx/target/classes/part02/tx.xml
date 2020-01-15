@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+<!-- 스프링에서 트랜잭션 처리 -->
+<!-- [2]선언적 트랜잭션(<tx:advice>)이용하는 방법 -->
+    <!-- [2-1] DataSource 빈 선언 -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" >
+        <property name="driverClassName" value="oracle.jdbc.OracleDriver" />
+        <property name="url" value="jdbc:oracle:thin://@192.168.106.1:2000:orcl" />
+        <property name="username" value="hr" />
+        <property name="password" value="oracle4U" />
+    </bean>
+    
+    <!-- [2-2] SqlSessionFactoryBean 빈 선언 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name = "dataSource" ref="dataSource" />
+        <property name = "mapperLocations">
+            <list>
+                <value>classpath:part02/memMapper.xml</value>
+            </list>
+        </property>
+    </bean>
+    
+    <!-- [2-3] SqlSessionTemplate 빈 선언 -->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory" />
+    </bean>
+    
+    <!-- [2-4] TransactionManager 빈 선언 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    
+    <!-- [1-5] TransactionTemplate 빈 선언 -->
+    <!-- 
+    <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+        <property name="transactionManager" ref="transactionManager" />
+    </bean>
+     -->
+     
+    <!-- [2-5] 선언적 트랜잭션:<tx:advice> 처리 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="*Process" rollback-for="java.lang.Exception"/>
+        </tx:attributes>
+    </tx:advice>
+     
+     <!--[2-6] 트랜잭션으로 처리할 메소드에 transactionManager등록-->
+     <aop:config>
+         <aop:pointcut expression="execution(* part02.ServiceImp.*Process(..))" id="aa"/>
+         <aop:advisor advice-ref="txAdvice" pointcut-ref="aa"/>
+     </aop:config>
+     
+    <!-- [2-6] MemDaoImp 빈 선언 -->
+    <bean id="dao" class="part02.MemDaoImp">
+        <property name="sqlSession" ref="sqlSession" />
+    </bean>
+    
+    <!-- [2-7] ServiceImp 빈 선언-->
+    <bean id="svc" class="part02.ServiceImp">
+        <property name="dao" ref="dao" />
+    </bean>
+    
+</beans>
